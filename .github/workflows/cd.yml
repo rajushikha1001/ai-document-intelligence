@@ -1,0 +1,23 @@
+name: CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  docker-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build images
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/api-gateway:latest api-gateway
+          docker build -t ghcr.io/${{ github.repository }}/model-service:latest model-service
+          docker build -t ghcr.io/${{ github.repository }}/worker:latest worker
+      - name: Push images
+        run: |
+          docker push ghcr.io/${{ github.repository }}/api-gateway:latest
+          docker push ghcr.io/${{ github.repository }}/model-service:latest
+          docker push ghcr.io/${{ github.repository }}/worker:latest
