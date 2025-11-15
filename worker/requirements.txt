@@ -1,0 +1,3 @@
+pika
+qdrant-client
+requests
